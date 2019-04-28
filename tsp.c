@@ -2,6 +2,7 @@
 #include <string.h>
 #include <math.h>
 #include <stdbool.h>
+#include "vnd.h"
 
 int calc_distance (float x1, float x2, float y1, float y2){
     float d = ((x2-x1)*(x2-x1))+((y2-y1)*(y2-y1));
@@ -35,19 +36,47 @@ void mount_display_data_section (int n, int M[n][n], float x[n], float y[n]){
     }
 }
 
-void mount_edge_weight_section (int n, int M[n][n], FILE* file){
+int mount_edge_weight_section (int n, int M[n][n], FILE* file){
     int i, j;
     for (i = 0; i<n;i++){
         for (j=0;j<n;j++){
             fscanf(file, "%d", &M[i][j]);
         }
     }
-    for (i = 0; i < n ; i++){
-        for (j = 0; j < n; j++){
-            printf(" %d ", M[i][j]);
-        }
-        printf ("\n");
+
+    return M;
+}
+
+void nearestNeighbor (int n, int M[n][n], int caminho[n], int custo[n]){
+    int i, j, start, menorCusto, menorCustoIndex;
+    bool new_route = false;
+    bool visited[n];
+
+    for (i = 0; i < n; i++){ //inicializa array de vértices visitados
+        visited[i] = false;
     }
+
+    visited[0] = visited[n] = true;
+    //start = 1;
+    for (i = 0; i < n-1; i++){
+        menorCusto = custo[i];
+        for (j = 0; j<n-1; j++){
+            if (i == j)
+                continue;
+            if (M[i][j] < menorCusto && !visited[j]){
+                menorCusto = M[i][j];
+                menorCustoIndex = j;
+                new_route = true;
+            }
+        }
+        if (new_route){
+            caminho[i+1] = menorCustoIndex;
+            new_route = false;
+            visited[menorCustoIndex] = true;
+        }
+        //start++;
+    }
+    printf ("\n%d", calcSolucao(n, M, caminho, custo));
 }
 
 int main (){
@@ -84,6 +113,8 @@ int main (){
         }
         ++i;
     }
+
+    int M[n][n];
     if (display){
         int index[n];
         float x[n];
@@ -98,13 +129,38 @@ int main (){
         for (i = 0; i<n;i++){
             printf ("\n%d   %f    %f", index[i], x[i], y[i]);
         }
-        int M[n][n];
         mount_display_data_section(n, M, x, y); //Lê coordenadas na seção DISPLAY_DATA e converte para matriz de adjacência
     }
 
     if (edge){
-        int M[n][n];
         mount_edge_weight_section (n, M,file); //Lê a matriz dada na seção EDGE_WEIGHT_SECTION
     }
     fclose(file);
+
+    int j;
+    for (i = 0; i < n ; i++){
+        for (j = 0; j < n; j++){
+            printf(" %d ", M[i][j]);
+        }
+        printf ("\n");
+    }
+
+    int caminho[n+1]; // um vertice em caminho[x] irá para caminho[x+1]
+    int custo[n];
+    for (i = 0 ; i <= n ; i++){ //constrói caminho arbitrário
+        if (i == n){
+            caminho[i] = caminho[0];
+            break;
+        }
+        custo[i] = INT_MAX;
+        caminho[i] = i;
+    }
+
+    int solucao = calcSolucao(n, M, caminho, custo);
+
+    nearestNeighbor (n, M, caminho, custo);
+    printf ("\noxe...%d", solucao);
+
+    vnd (n, M, caminho, custo);
+
 }
