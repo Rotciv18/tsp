@@ -36,7 +36,7 @@ void mount_display_data_section (int n, int M[n][n], float x[n], float y[n]){
     }
 }
 
-int mount_edge_weight_section (int n, int M[n][n], FILE* file){
+void mount_edge_weight_section (int n, int M[n][n], FILE* file){
     int i, j;
     for (i = 0; i<n;i++){
         for (j=0;j<n;j++){
@@ -44,11 +44,11 @@ int mount_edge_weight_section (int n, int M[n][n], FILE* file){
         }
     }
 
-    return M;
+    //return M;
 }
 
 void nearestNeighbor (int n, int M[n][n], int caminho[n], int custo[n]){
-    int i, j, start, menorCusto, menorCustoIndex;
+    int i, j, menorCusto, menorCustoIndex;
     bool new_route = false;
     bool visited[n];
 
@@ -80,7 +80,7 @@ void nearestNeighbor (int n, int M[n][n], int caminho[n], int custo[n]){
 }
 
 int main (){
-    FILE* file = fopen ("bayg29.txt", "r"); //abre o arquivo passado como argumento
+    FILE* file = fopen ("ch150.txt", "r"); //abre o arquivo passado como argumento
     if (file == NULL)
     {
       printf ("Falha ao tentar ler arquivo.");
@@ -156,10 +156,8 @@ int main (){
         caminho[i] = i;
     }
 
-    int solucao = calcSolucao(n, M, caminho, custo);
 
     nearestNeighbor (n, M, caminho, custo);
-    printf ("\noxe...%d", solucao);
 
     vnd (n, M, caminho, custo);
 
