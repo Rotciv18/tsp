@@ -2,8 +2,13 @@
 #define VND_H_INCLUDED
 #include <stdbool.h>
 #include <limits.h>
+#include <stdlib.h>
 
-//Retorna SoluÁ„o dado um caminho atual
+int rand_lim(int min_n, int max_n) {
+    return rand() % (max_n - min_n + 1) + min_n;
+}
+
+//Retorna Solu√ß√£o dado um caminho atual
 int calcSolucao (int n, int M[n][n], int caminho[n], int custo[n]){
     int i;
     int solucao = 0;
@@ -22,10 +27,11 @@ void vnd (int n, int M[n][n], int caminho[n], int custo[n]){
     int solucao = calcSolucao(n, M, caminho, custo);
     int novaSolucao = INT_MAX;
     int i, j, aux;
-    i = j = 1; //ComeÁa de 1 pois 0 È o vÈrtice de partida e n„o deve sofrer swap
+    i = j = 1; //Come√ßa de 1 pois 0 √© o v√©rtice de partida e n√£o deve sofrer swap
     int start = 1;
+
     //----SWAP----
-    while (i < n-1){ //'n-1' pois o ˙ltimo vÈrtice È o vÈrtice de partida e n„o deve sofrer swap
+    while (i < n-1){ //'n-1' pois o √∫ltimo v√©rtice √© o v√©rtice de partida e n√£o deve sofrer swap
         while (j < n-1){
             if (i == j){
                 j++;
@@ -34,12 +40,15 @@ void vnd (int n, int M[n][n], int caminho[n], int custo[n]){
             aux = caminho [i];
             caminho[i] = caminho[j];
             caminho[j] = aux;
-            j++;
             novaSolucao = calcSolucao(n, M, caminho, custo);
             if (novaSolucao < solucao){
                 foundSol = true;
                 break;
+            } else { //Desfaz swap caso solu√ß√£o seja desagrad√°vel
+                caminho[j] = caminho[i];
+                caminho[i] = aux;
             }
+            j++;
         }
         j = ++start;
         i++;
@@ -59,7 +68,6 @@ void vnd (int n, int M[n][n], int caminho[n], int custo[n]){
     //------2-OPT-----
     int k;
     for (k = 4 ; k < n ; k++){
-        printf("\nk = %d", k);
         for (i = k-3; i<k;i++){
             aux = caminho[i];
             caminho[i] = caminho[k];
@@ -69,18 +77,51 @@ void vnd (int n, int M[n][n], int caminho[n], int custo[n]){
         if (novaSolucao < solucao){
             solucao = novaSolucao;
             printf("\nOPT! Nova solucao: %d", solucao);
-        } else { //desfaz a troca caso a soluÁ„o n„o seja melhor para manter as rotas
+        } else { //desfaz a troca caso a solu√ß√£o n√£o seja melhor para manter as rotas
             for (i = k-3; i<k;i++){
                 aux = caminho[i];
                 caminho[i] = caminho[k];
                 caminho[k] = aux;
             }
-            printf ("  - Deu ruim");
         }
     }
 
     //-----RE-INSERTION-----
+    k = n-1;
+    int index;
+    printf("\nBuscando novas solucoes ");
+    while(1){
+    if (k <=1)
+        k=n-1;
+    while (k > 1){
+        index = rand_lim(0, k-2);
+        aux = caminho[k];
+        for (i = k-1; i>=index;i--){
+            if (i == index){
+                caminho[i+1] = aux;
+                break;
+            }
+            caminho[i+1] = caminho[i];
+        }
 
+        k--;
+        novaSolucao = calcSolucao(n, M, caminho, custo);
+        if (novaSolucao < solucao){
+            solucao = novaSolucao;
+            printf ("\nRe-Insert: %d", solucao);
+            k = n;
+        } else {        //Desfaz
+            for (i = index+1; i<=k+1;i++){
+                if (i == k+1){
+                    caminho[i] = aux;
+                    break;
+                }
+                caminho[i] = caminho[i+1];
+            }
+        }
+    }
+    k=n-1;
+    }
 }
 
 
