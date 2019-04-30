@@ -80,7 +80,7 @@ void nearestNeighbor (int n, int M[n][n], int caminho[n], int custo[n]){
 }
 
 int main (){
-    FILE* file = fopen ("ch150.txt", "r"); //abre o arquivo passado como argumento
+    FILE* file = fopen ("ch130.txt", "r"); //abre o arquivo passado como argumento
     if (file == NULL)
     {
       printf ("Falha ao tentar ler arquivo.");
@@ -138,12 +138,14 @@ int main (){
     fclose(file);
 
     int j;
+    /*
     for (i = 0; i < n ; i++){
         for (j = 0; j < n; j++){
             printf(" %d ", M[i][j]);
         }
         printf ("\n");
     }
+    */
 
     int caminho[n+1]; // um vertice em caminho[x] irá para caminho[x+1]
     int custo[n];
