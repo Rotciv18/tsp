@@ -4,6 +4,8 @@
 #include <limits.h>
 #include <stdlib.h>
 
+
+
 int rand_lim(int min_n, int max_n) {
     return rand() % (max_n - min_n + 1) + min_n;
 }
@@ -19,6 +21,46 @@ int calcSolucao (int n, int M[n][n], int caminho[n], int custo[n]){
         solucao = solucao + custo[i];
     }
     return solucao;
+}
+
+bool vnd_reinsert (int n, int M[n][n], int caminho, int custo, int *solucao){
+    int i, j, start, novaSolucao, menorSolucao, v1, v2, aux;
+    bool swaped = false;
+    
+    i = j = start = 1;
+    menorSolucao = *solucao;
+    novaSolucao = INT_MAX;
+    
+    while (i<n-1){
+        while (j<n-1){
+            if (i == j){
+                j++;
+                continue;
+            }
+            novaSolucao = *solucao - M[caminho[i-1]][caminho[i]] - M[caminho[i]][caminho[i+1]] - M[caminho[j]][caminho[j+1]]
+                                   + M[caminho[i-1]][caminho[i+1]] + M[caminho[j]][caminho[i]] + M[caminho[i]][caminho[j+1]];
+            if (novaSolucao < menorSolucao){
+                v1 = i;
+                v2 = j;
+            }
+            j++;
+        }
+        j = ++start;
+        i++;
+    }
+    if (menorSolucao < *solucao){
+        aux = caminho[v1];
+        for (i = v1; i <= v2; i++){
+           if (i == v2){
+               caminho[i] = aux;
+           }
+           caminho[i] = caminho[i+1];
+        }
+        *solucao = calcSolucao (n, M, caminho, custo);
+        swaped = true;
+        printf ("\nRE-INSERT nova solucao: %d", *solucao);
+    }
+    return swaped;
 }
 
 
