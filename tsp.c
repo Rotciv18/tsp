@@ -76,7 +76,7 @@ void nearestNeighbor (int n, int M[n][n], int caminho[n], int custo[n]){
         }
         //start++;
     }
-    printf ("\n%d", calcSolucao(n, M, caminho, custo));
+    printf ("\nSolucao Vizinho mais Proximo: %d", calcSolucao(n, M, caminho, custo));
 }
 
 int main (){
