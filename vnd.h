@@ -9,7 +9,7 @@ int rand_lim(int min_n, int max_n) {
 }
 
 //Retorna Solução dado um caminho atual
-int calcSolucao (int n, int M[n][n], int caminho[n], int custo[n]){
+int calcSolucao (int n, int **M, int caminho[n], int custo[n]){
     int i;
     int solucao = 0;
     for (i = 0; i<n; i++){
@@ -21,7 +21,7 @@ int calcSolucao (int n, int M[n][n], int caminho[n], int custo[n]){
     return solucao;
 }
 
-bool vndSwap (int n, int M[n][n], int caminho[n], int custo[n], int *solucao){
+bool vndSwap (int n, int **M, int caminho[n], int custo[n], int *solucao){
 
     int i, j, start, novaSolucao, menorSolucao, v1, v2, aux;
     bool swaped = false;
@@ -67,7 +67,7 @@ bool vndSwap (int n, int M[n][n], int caminho[n], int custo[n], int *solucao){
     return swaped;
 }
 
-bool vnd_reinsert (int n, int M[n][n], int caminho[n], int custo[n], int *solucao){
+bool vnd_reinsert (int n, int **M, int caminho[n], int custo[n], int *solucao){
     int i, j, start, menorSolucao, v1, v2, aux;
     bool swaped = false;
     int sol = *solucao;
@@ -109,7 +109,7 @@ bool vnd_reinsert (int n, int M[n][n], int caminho[n], int custo[n], int *soluca
     return swaped;
 }
 
-bool vnd_twoOpt(int n, int M[n][n], int caminho[n], int custo[n], int *solucao){
+bool vnd_twoOpt(int n, int **M, int caminho[n], int custo[n], int *solucao){
     int i, j, menorSolucao, novaSolucao, v1, v2, aux;
     bool swaped = false;
 
@@ -169,7 +169,7 @@ void vnd (int n, int M[n][n], int caminho[n], int custo[n]){
     }
     printf("\nCaminho: ");
     for (i = 0 ; i <= n ; i++){
-        printf ("%d->", caminho[i]);
+        printf ("%d, ", caminho[i]);
     }
     printf ("\nSolucao total: %d", calcSolucao(n, M, caminho, custo));
 
