@@ -9,12 +9,13 @@ int calc_distance (float x1, float x2, float y1, float y2){
     return round(sqrt(d));
 }
 
-void mount_display_data_section (int n, int M[n][n], float x[n], float y[n]){
+void mount_display_data_section (int n, int **M, float x[n], float y[n]){
     int i, j;
     int start = 0;
     for (i = 0; i < n - 1 ; i++)
     {
-        for (j = start; j < n ; j++){
+        printf ("\ni = %d", i);
+        for (j = start; j < n; j++){
             if (i == j){
                 M[i][j] = M[j][i] = 0;
                 continue;
@@ -24,7 +25,7 @@ void mount_display_data_section (int n, int M[n][n], float x[n], float y[n]){
         start++;
     }
     printf ("\n");
-    for (i = 0; i < n ; i++){
+    /*for (i = 0; i < n ; i++){
         for (j = 0; j < n; j++){
             if (i == j){
                 printf (" %d ", M[i][j]);
@@ -33,10 +34,10 @@ void mount_display_data_section (int n, int M[n][n], float x[n], float y[n]){
             printf(" %d ", M[i][j]);
         }
         printf ("\n");
-    }
+    }*/
 }
 
-void mount_edge_weight_section (int n, int M[n][n], FILE* file){
+void mount_edge_weight_section (int n, int **M, FILE* file){
     int i, j;
     for (i = 0; i<n;i++){
         for (j=0;j<n;j++){
@@ -47,7 +48,7 @@ void mount_edge_weight_section (int n, int M[n][n], FILE* file){
     //return M;
 }
 
-void nearestNeighbor (int n, int M[n][n], int caminho[n], int custo[n]){
+void nearestNeighbor (int n, int **M, int caminho[n], int custo[n]){
     int i, j, menorCusto, menorCustoIndex;
     bool new_route = false;
     bool visited[n];
@@ -80,7 +81,7 @@ void nearestNeighbor (int n, int M[n][n], int caminho[n], int custo[n]){
 }
 
 int main (){
-    FILE* file = fopen ("ch130.txt", "r"); //abre o arquivo passado como argumento
+    FILE* file = fopen ("tsp1.txt", "r"); //abre o arquivo passado como argumento
     if (file == NULL)
     {
       printf ("Falha ao tentar ler arquivo.");
@@ -113,8 +114,11 @@ int main (){
         }
         ++i;
     }
-
-    int M[n][n];
+    //int M[n][n];
+    int **M;
+    M = (int**)malloc(sizeof(int*)*n+1);
+    for (i = 0; i <= n; i++)
+        M[i] = (int*)malloc(sizeof(int)*n+1);
     if (display){
         int index[n];
         float x[n];
@@ -131,7 +135,6 @@ int main (){
         }
         mount_display_data_section(n, M, x, y); //Lê coordenadas na seção DISPLAY_DATA e converte para matriz de adjacência
     }
-
     if (edge){
         mount_edge_weight_section (n, M,file); //Lê a matriz dada na seção EDGE_WEIGHT_SECTION
     }
