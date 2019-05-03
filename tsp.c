@@ -12,7 +12,7 @@ int calc_distance (float x1, float x2, float y1, float y2){
 void mount_display_data_section (int n, int **M, float x[n], float y[n]){
     int i, j;
     int start = 0;
-    for (i = 0; i < n - 1 ; i++)
+    for (i = 0; i < n ; i++)
     {
         printf ("\ni = %d", i);
         for (j = start; j < n; j++){
@@ -49,7 +49,7 @@ void mount_edge_weight_section (int n, int **M, FILE* file){
 }
 
 void nearestNeighbor (int n, int **M, int caminho[n], int custo[n]){
-    int i, j, menorCusto, menorCustoIndex;
+    int i, j, menorCusto, menorCustoIndex, aux;
     bool new_route = false;
     bool visited[n];
 
@@ -61,27 +61,29 @@ void nearestNeighbor (int n, int **M, int caminho[n], int custo[n]){
     //start = 1;
     for (i = 0; i < n-1; i++){
         menorCusto = custo[i];
-        for (j = 0; j<n-1; j++){
+        for (j = 0; j<n; j++){
             if (i == j)
                 continue;
-            if (M[i][j] < menorCusto && !visited[j]){
-                menorCusto = M[i][j];
+            if (M[caminho[i]][caminho[j]] < menorCusto && !visited[j]){
+                menorCusto = M[caminho[i]][caminho[j]];
                 menorCustoIndex = j;
                 new_route = true;
             }
         }
         if (new_route){
-            caminho[i+1] = menorCustoIndex;
+            aux = caminho[i+1];
+            caminho[i+1] = caminho[menorCustoIndex];
+            caminho[menorCustoIndex] = aux;
             new_route = false;
             visited[menorCustoIndex] = true;
         }
+        calcSolucao(n, M, caminho, custo);
         //start++;
     }
-    printf ("\nSolucao Vizinho mais Proximo: %d", calcSolucao(n, M, caminho, custo));
 }
 
 int main (){
-    FILE* file = fopen ("tsp1.txt", "r"); //abre o arquivo passado como argumento
+    FILE* file = fopen ("bier127.txt", "r"); //abre o arquivo passado como argumento
     if (file == NULL)
     {
       printf ("Falha ao tentar ler arquivo.");
@@ -161,9 +163,25 @@ int main (){
         caminho[i] = i;
     }
 
+    int solucao, menorSolucao;
 
     nearestNeighbor (n, M, caminho, custo);
-
+    menorSolucao = calcSolucao(n, M, caminho, custo);
+    printf("\nSolucao vizinho mais proximo: %d", menorSolucao);
     vnd (n, M, caminho, custo);
 
+    printf("\nCaminho: ");
+    for (i = 0 ; i <= n ; i++){
+        printf ("%d, ", caminho[i]);
+    }
+    printf ("\nSolucao total: %d", calcSolucao(n, M, caminho, custo));
+    /*while (true){
+        nearestNeighbor(n, M, caminho, custo);
+        vnd (n, M, caminho, custo);
+        printf("\nCaminho: ");
+        for (i = 0 ; i <= n ; i++){
+            printf ("%d, ", caminho[i]);
+        }
+        printf ("\nSolucao total: %d", calcSolucao(n, M, caminho, custo));
+    }*/
 }
