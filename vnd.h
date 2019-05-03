@@ -22,7 +22,6 @@ int calcSolucao (int n, int **M, int caminho[n], int custo[n]){
 }
 
 bool vndSwap (int n, int **M, int caminho[n], int custo[n], int *solucao){
-
     int i, j, start, novaSolucao, menorSolucao, v1, v2, aux;
     bool swaped = false;
 
@@ -70,7 +69,6 @@ bool vndSwap (int n, int **M, int caminho[n], int custo[n], int *solucao){
 bool vnd_reinsert (int n, int **M, int caminho[n], int custo[n], int *solucao){
     int i, j, start, menorSolucao, v1, v2, aux;
     bool swaped = false;
-    int sol = *solucao;
     i = j = start = 1;
     menorSolucao = *solucao;
     int novaSolucao = INT_MAX;
@@ -95,12 +93,22 @@ bool vnd_reinsert (int n, int **M, int caminho[n], int custo[n], int *solucao){
     }
     if (menorSolucao < *solucao){
         aux = caminho[v1];
-        for (i = v1; i <= v2; i++){
-           if (i == v2){
-               caminho[i] = aux;
-               break;
-           }
-           caminho[i] = caminho[i+1];
+        if (v2 > v1){
+            for (i = v1; i <= v2; i++){
+               if (i == v2){
+                   caminho[i] = aux;
+                   break;
+               }
+               caminho[i] = caminho[i+1];
+            }
+        } else {
+            for (i = v1; i >= v2; i--){
+               if (i == v2){
+                   caminho[i] = aux;
+                   break;
+               }
+               caminho[i] = caminho[i-1];
+            }
         }
         *solucao = calcSolucao (n, M, caminho, custo);
         swaped = true;
@@ -118,7 +126,7 @@ bool vnd_twoOpt(int n, int **M, int caminho[n], int custo[n], int *solucao){
     novaSolucao = INT_MAX;
 
     while (i < n-2){
-        for (j = i+3 ; j<=n; j++){
+        for (j = i+3 ; j<n; j++){
             novaSolucao = *solucao - M[caminho[i-1]][caminho[i]] - M[caminho[j+1]][caminho[j]]
                                    + M[caminho[j+1]][caminho[i]] + M[caminho[i-1]][caminho[j]];
             if (novaSolucao < menorSolucao){
@@ -154,49 +162,18 @@ void vnd (int n, int M[n][n], int caminho[n], int custo[n]){
     int start = 1;
 */
     while (true){
-        if (!vndSwap(n, M, caminho, custo, &solucao))
-            break;
-    }
-
-    while (true){
-        if (!vnd_twoOpt(n, M, caminho, custo, &solucao))
-            break;
-    }
-
-    while (true){
-        if (!vnd_reinsert(n, M, caminho, custo, &solucao))
-            break;
-    }
-    printf("\nCaminho: ");
-    for (i = 0 ; i <= n ; i++){
-        printf ("%d, ", caminho[i]);
-    }
-    printf ("\nSolucao total: %d", calcSolucao(n, M, caminho, custo));
-
-
-
-
-    //------2-OPT-----
-    /*int k;
-    for (k = 4 ; k < n ; k++){
-        for (i = k-3; i<k;i++){
-            aux = caminho[i];
-            caminho[i] = caminho[k];
-            caminho[k] = aux;
+        while (true){
+            if (!vndSwap(n, M, caminho, custo, &solucao))
+                break;
         }
-        novaSolucao = calcSolucao(n, M, caminho, custo);
-        if (novaSolucao < solucao){
-            solucao = novaSolucao;
-            printf("\nOPT! Nova solucao: %d", solucao);
-        } else { //desfaz a troca caso a solução não seja melhor para manter as rotas
-            for (i = k-3; i<k;i++){
-                aux = caminho[i];
-                caminho[i] = caminho[k];
-                caminho[k] = aux;
-            }
-        }
-    }*/
+        if (vnd_twoOpt(n, M, caminho, custo, &solucao))
+            continue;
 
+        if (vnd_reinsert(n, M, caminho, custo, &solucao))
+            continue;
+
+        break;
+    }
 }
 
 
