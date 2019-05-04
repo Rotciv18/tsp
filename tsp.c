@@ -64,7 +64,7 @@ void nearestNeighbor (int n, int **M, int caminho[n], int custo[n]){
         for (j = 0; j<n; j++){
             if (i == j)
                 continue;
-            if (M[caminho[i]][caminho[j]] < menorCusto && !visited[j]){
+            if (M[caminho[i]][caminho[j]] < menorCusto && !visited[j]){ //Alterado e agora tá todo cagado mas ainda funciona
                 menorCusto = M[caminho[i]][caminho[j]];
                 menorCustoIndex = j;
                 new_route = true;
@@ -83,7 +83,7 @@ void nearestNeighbor (int n, int **M, int caminho[n], int custo[n]){
 }
 
 int main (){
-    FILE* file = fopen ("bier127.txt", "r"); //abre o arquivo passado como argumento
+    FILE* file = fopen ("bier127.txt", "r"); //abre o arquivo
     if (file == NULL)
     {
       printf ("Falha ao tentar ler arquivo.");
@@ -91,9 +91,9 @@ int main (){
     }
     int n;
     int i = 0;
-    const char *s[100];
+    const char *s[100]; 
 
-    while (fscanf(file, "%s", &s[i])){
+    while (fscanf(file, "%s", &s[i])){ //procura pela string "DIMENSION:" no arquivo
         if (!strcmp(&s[i], "DIMENSION:")){
             fscanf(file, "%d", &n);
             break;
@@ -105,7 +105,7 @@ int main (){
     const char *s1[2000];
     bool display = false;
     bool edge = false;
-    while (fscanf(file, "%s", &s1[i])){
+    while (fscanf(file, "%s", &s1[i])){ //procura por uma das duas strings para saber com o quê lidar
         if (!strcmp(&s1[i], "DISPLAY_DATA_SECTION")){
             display = true;
             break;
@@ -121,7 +121,7 @@ int main (){
     M = (int**)malloc(sizeof(int*)*n+1);
     for (i = 0; i <= n; i++)
         M[i] = (int*)malloc(sizeof(int)*n+1);
-    if (display){
+    if (display){ 
         int index[n];
         float x[n];
         float y[n];
@@ -144,16 +144,16 @@ int main (){
 
     int j;
     /*
-    for (i = 0; i < n ; i++){
+    for (i = 0; i < n ; i++){ //printa a matriz de adjacencia
         for (j = 0; j < n; j++){
-            printf(" %d ", M[i][j]);
+            printf(" %d ", M[i][j]); 
         }
         printf ("\n");
     }
     */
 
-    int caminho[n+1]; // um vertice em caminho[x] irá para caminho[x+1]
-    int custo[n];
+    int caminho[n+1]; // array contendo a ROTA de uma solução
+    int custo[n];     //array contendo o CUSTO de cada aresta (custo[i] == M[caminho][i]][caminho[i+]]
     for (i = 0 ; i <= n ; i++){ //constrói caminho arbitrário
         if (i == n){
             caminho[i] = caminho[0];
@@ -165,12 +165,15 @@ int main (){
 
     int solucao, menorSolucao;
 
+    //heurística construtiva
     nearestNeighbor (n, M, caminho, custo);
     menorSolucao = calcSolucao(n, M, caminho, custo);
     printf("\nSolucao vizinho mais proximo: %d", menorSolucao);
+    //busca local
     vnd (n, M, caminho, custo);
 
     printf("\nCaminho: ");
+    //printa o caminho
     for (i = 0 ; i <= n ; i++){
         printf ("%d, ", caminho[i]);
     }
