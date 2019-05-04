@@ -29,6 +29,7 @@ bool vndSwap (int n, int **M, int caminho[n], int custo[n], int *solucao){
     menorSolucao = *solucao;
     novaSolucao = INT_MAX;
 
+    //simula swap de todos os vértices entre eles mesmos. Escolhe aqueles que gerarem melhor solução e realiza o swap
     while (i < n-1){
         while (j < n-1){
             if (i == j){
@@ -54,6 +55,7 @@ bool vndSwap (int n, int **M, int caminho[n], int custo[n], int *solucao){
         j = ++start;
         i++;
     }
+    //realiza o swap
     if (menorSolucao < *solucao){
         aux = caminho[v1];
         caminho[v1] = caminho[v2];
@@ -73,9 +75,10 @@ bool vnd_reinsert (int n, int **M, int caminho[n], int custo[n], int *solucao){
     menorSolucao = *solucao;
     int novaSolucao = INT_MAX;
 
+    //simula todas as inserções possívels
     while (i<n-1){
         while (j<n){
-            if (i == j){
+            if (i == j || i == j-1){
                 j++;
                 continue;
             }
@@ -88,7 +91,7 @@ bool vnd_reinsert (int n, int **M, int caminho[n], int custo[n], int *solucao){
             }
             j++;
         }
-        j = ++start;
+        j = 1;
         i++;
     }
     if (menorSolucao < *solucao){
@@ -125,6 +128,7 @@ bool vnd_twoOpt(int n, int **M, int caminho[n], int custo[n], int *solucao){
     menorSolucao = *solucao;
     novaSolucao = INT_MAX;
 
+    //simula todas as alterações possíveis
     while (i < n-2){
         for (j = i+3 ; j<n; j++){
             novaSolucao = *solucao - M[caminho[i-1]][caminho[i]] - M[caminho[j+1]][caminho[j]]
@@ -166,7 +170,8 @@ void vnd (int n, int M[n][n], int caminho[n], int custo[n]){
             if (!vndSwap(n, M, caminho, custo, &solucao))
                 break;
         }
-        if (vnd_twoOpt(n, M, caminho, custo, &solucao))
+        //retorna para o vndSwap caso alguma alteração seja feita em vnd_twoOpt ou vnd_reinsert
+        if (vnd_twoOpt(n, M, caminho, custo, &solucao)) 
             continue;
 
         if (vnd_reinsert(n, M, caminho, custo, &solucao))
