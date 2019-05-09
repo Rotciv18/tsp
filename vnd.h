@@ -1,274 +1,180 @@
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
+#ifndef VND_H_INCLUDED
+#define VND_H_INCLUDED
 #include <stdbool.h>
-#include "vnd.h"
+#include <limits.h>
+#include <stdlib.h>
 
-int calc_distance (float x1, float x2, float y1, float y2){
-    float d = ((x2-x1)*(x2-x1))+((y2-y1)*(y2-y1));
-    return round(sqrt(d));
+int rand_lim(int min_n, int max_n) {
+    return rand() % (max_n - min_n + 1) + min_n;
 }
 
-void mount_display_data_section (int n, int **M, float x[n], float y[n]){
-    int i, j;
-    int start = 0;
-    for (i = 0; i < n ; i++)
-    {
-        printf ("\ni = %d", i);
-        for (j = start; j < n; j++){
-            if (i == j){
-                M[i][j] = M[j][i] = 0;
-                continue;
-            }
-            M[i][j] = M[j][i] = calc_distance(x[i], x[j], y[i], y[j]);
-        }
-        start++;
+//Retorna Solução dado um caminho atual
+int calcSolucao (int n, int **M, int caminho[n], int custo[n]){
+    int i;
+    int solucao = 0;
+    for (i = 0; i<n; i++){
+        custo[i] = M[caminho[i]][caminho[i+1]]; //FAVOR LEMBRAR DISSO QUANDO QUISER SABER CUSTOS DE CAMINHOS
     }
-    printf ("\n");
-    /*for (i = 0; i < n ; i++){
-        for (j = 0; j < n; j++){
-            if (i == j){
-                printf (" %d ", M[i][j]);
-                continue;
-            }
-            printf(" %d ", M[i][j]);
-        }
-        printf ("\n");
-    }*/
-}
-
-void mount_edge_weight_section (int n, int **M, FILE* file){
-    int i, j;
-    for (i = 0; i<n;i++){
-        for (j=0;j<n;j++){
-            fscanf(file, "%d", &M[i][j]);
-        }
-    }
-
-    //return M;
-}
-
-void nearestNeighbor (int n, int **M, int caminho[n], int custo[n]){
-    int i, j, k, menorCusto, menorCustoIndex, maiorCusto, maiorCustoIndex, aux, indexRandom;
-    bool new_route = false;
-/*
-    bool *visited;
-    visited = malloc(n* sizeof(bool));*/
-    bool visited[n];
-
-    int *LCR;
-    LCR = malloc(n* sizeof(int));
-
-    float alfa = 0.8;
-    float custolimite = 0;
-    float random;
-    int countLCR = 0;
-
-    for (i = 0; i < n; i++){ //inicializa array de vértices visitados
-        visited[i] = false;
-    }
-
-    visited[0] = visited[n] = true;
-    //start = 1;
-    for (i = 0; i < n-1; i++){
-        menorCusto = INT_MAX;
-        maiorCusto = 0;
-        for (j = 1; j<n; j++){
-            if (i == j)
-                continue;
-            if (M[caminho[i]][caminho[j]] <= menorCusto && !visited[j]){
-                menorCusto = M[caminho[i]][caminho[j]];
-                menorCustoIndex = j;
-            }
-            if (M[caminho[i]][caminho[j]] >= maiorCusto && !visited[j]){
-                maiorCusto = M[caminho[i]][caminho[j]];
-                maiorCustoIndex = j;
-            }
-        }
-        custolimite = menorCusto + alfa * (maiorCusto - menorCusto);
-
-        countLCR = 0;
-
-        //cria LCR
-        for(k = 0; k<n; k++){
-            if (i == k)
-                continue;
-            if(M[caminho[i]][caminho[k]] <= custolimite && !visited[k]){
-                LCR[countLCR] = k;
-                countLCR++;
-            }
-        }
-        if (countLCR == 0){
-            break;
-        }
-        srand(time(NULL));
-
-        random = rand() % countLCR;
-        indexRandom = (int)round(random);
-        indexRandom = LCR[indexRandom];
-        new_route = true;
-
-        if (new_route){
-            aux = caminho[i+1];
-            caminho[i+1] = caminho[indexRandom];
-            caminho[indexRandom] = aux;
-            new_route = false;
-            visited[indexRandom] = true;
-        }
-        //calcSolucao(n, M, caminho, custo);
-        //start++;
-    }
-    free(LCR);
-    //free(visited);
-}
-
-void caminhoAleatorio (int n, int **M, int caminho[n], int custo[n]){
-    bool visited[n+1];
-    int vizinhanca[n];
-    int i, j, index;
-
-    for (i = 0; i<=n;i++)
-        visited[i] = false;
-    visited[0] = visited[n] = true;
-
     for (i = 0; i < n; i++){
-        index = 0;
+        solucao = solucao + custo[i];
+    }
+    return solucao;
+}
 
-        for (j = 0; j < n; j++){
-            if (!visited[j]){
-                vizinhanca[index] = j;
-                index++;
+bool vndSwap (int n, int **M, int caminho[n], int custo[n], int *solucao){
+    int i, j, start, novaSolucao, menorSolucao, v1, v2, aux;
+    bool swaped = false;
+
+    i = j = start = 1;
+    menorSolucao = *solucao;
+    novaSolucao = INT_MAX;
+
+    while (i < n-1){
+        while (j < n-1){
+            if (i == j){
+                j++;
+                continue;
             }
+            if (j == i+1){ //Vértices adjacentes
+                novaSolucao = *solucao - M[caminho[i-1]][caminho[i]] - M[caminho[j]][caminho[j+1]]
+                                  + M[caminho[i-1]][caminho[j]] + M[caminho[i]][caminho[j+1]];
+            } else{ // Se os dois vértices não são adjacentes~
+                novaSolucao = *solucao - M[caminho[i-1]][caminho[i]] - M[caminho[j]][caminho[j+1]]
+                                  + M[caminho[i-1]][caminho[j]] + M[caminho[i]][caminho[j+1]]
+                                  - M[caminho[i]][caminho[i+1]] - M[caminho[j-1]][caminho[j]]
+                                  + M[caminho[j]][caminho[i+1]] + M[caminho[j-1]][caminho[i]];
+            }
+            if (novaSolucao < menorSolucao){
+                menorSolucao = novaSolucao;
+                v1 = i;
+                v2 = j;
+            }
+            j++;
         }
+        j = ++start;
+        i++;
+    }
+    if (menorSolucao < *solucao){
+        aux = caminho[v1];
+        caminho[v1] = caminho[v2];
+        caminho[v2] = aux;
+        swaped = true;
+        *solucao = calcSolucao(n, M, caminho, custo);
+        //printf("\nSWAP Nova solucao: %d", *solucao);
+    }
 
-        if (index == 0){
-            caminho[i+1] = 0;
+    return swaped;
+}
+
+bool vnd_reinsert (int n, int **M, int caminho[n], int custo[n], int *solucao){
+    int i, j, start, menorSolucao, v1, v2, aux;
+    bool swaped = false;
+    i = j = start = 1;
+    menorSolucao = *solucao;
+    int novaSolucao = INT_MAX;
+
+    while (i<n-1){
+        while (j<n){
+            if (i == j || j == i-1){
+                j++;
+                continue;
+            }
+            novaSolucao = *solucao - M[caminho[i-1]][caminho[i]] - M[caminho[i]][caminho[i+1]] - M[caminho[j]][caminho[j+1]]
+                                   + M[caminho[i-1]][caminho[i+1]] + M[caminho[j]][caminho[i]] + M[caminho[i]][caminho[j+1]];
+            if (novaSolucao < menorSolucao){
+                v1 = i;
+                v2 = j;
+                menorSolucao = novaSolucao;
+            }
+            j++;
+        }
+        j = 1;
+        i++;
+    }
+    if (menorSolucao < *solucao){
+        aux = caminho[v1];
+        if (v2 > v1){
+            for (i = v1; i <= v2; i++){
+               if (i == v2){
+                   caminho[i] = aux;
+                   break;
+               }
+               caminho[i] = caminho[i+1];
+            }
         } else {
-            //srand(time(NULL));
-            srand(time(NULL));
-            int vizinho_selecionado = rand() % index;
-            caminho[i+1] = vizinhanca[vizinho_selecionado];
-            visited[vizinhanca[vizinho_selecionado]] = true;
-        }
-    }
-
-}
-
-int main (){
-    FILE* file = fopen ("tsp2.txt", "r"); //abre o arquivo passado como argumento
-    if (file == NULL)
-    {
-      printf ("Falha ao tentar ler arquivo.");
-      return 1;
-    }
-    int n;
-    int i = 0;
-    const char *s[100];
-
-    while (fscanf(file, "%s", &s[i])){
-        if (!strcmp(&s[i], "DIMENSION:")){
-            fscanf(file, "%d", &n);
-            break;
-        }
-        ++i;
-    }
-
-    printf ("%s %d\n", &s[i], n);
-    const char *s1[2000];
-    bool display = false;
-    bool edge = false;
-    while (fscanf(file, "%s", &s1[i])){
-        if (!strcmp(&s1[i], "DISPLAY_DATA_SECTION")){
-            display = true;
-            break;
-        }
-        if (!strcmp(&s1[i], "EDGE_WEIGHT_SECTION")){
-            edge = true;
-            break;
-        }
-        ++i;
-    }
-    //int M[n][n];
-    int **M;
-    M = (int**)malloc(sizeof(int*)*n+1);
-    for (i = 0; i <= n; i++)
-        M[i] = (int*)malloc(sizeof(int)*n+1);
-    if (display){
-        int index[n];
-        float x[n];
-        float y[n];
-
-        for (i = 0; i<n ; i++){
-            fscanf(file, "%d", &index[i]);
-            //printf("\n%d", index[i]);
-            fscanf(file, "%f", &x[i]);
-            fscanf(file, "%f", &y[i]);
-        }
-        for (i = 0; i<n;i++){
-            printf ("\n%d   %f    %f", index[i], x[i], y[i]);
-        }
-        mount_display_data_section(n, M, x, y); //Lê coordenadas na seção DISPLAY_DATA e converte para matriz de adjacência
-    }
-    if (edge){
-        mount_edge_weight_section (n, M,file); //Lê a matriz dada na seção EDGE_WEIGHT_SECTION
-    }
-    fclose(file);
-
-    int j;
-    /*
-    for (i = 0; i < n ; i++){
-        for (j = 0; j < n; j++){
-            printf(" %d ", M[i][j]);
-        }
-        printf ("\n");
-    }
-    */
-
-    int caminho[n+1]; // um vertice em caminho[x] irá para caminho[x+1]
-    int custo[n];
-    for (i = 0 ; i <= n ; i++){ //constrói caminho arbitrário
-        if (i == n){
-            caminho[i] = caminho[0];
-            break;
-        }
-        custo[i] = INT_MAX;
-        caminho[i] = i;
-    }
-
-    int solucao, menorSolucao;
-
-    nearestNeighbor(n, M, caminho, custo);
-    menorSolucao = calcSolucao(n, M, caminho, custo);
-    printf("\nSolucao vizinho mais proximo: %d", menorSolucao);
-    vnd (n, M, caminho, custo);
-    solucao = calcSolucao(n, M, caminho, custo);
-    if (menorSolucao < solucao)
-        menorSolucao = solucao;
-
-    FILE* filew = fopen ("solucao.txt", "w");
-    printf("\nCaminho: ");
-    fprintf(filew, "Solucao: %d\nCaminho: ");
-    for (i = 0 ; i <= n ; i++){
-        printf ("%d, ", caminho[i]);
-        fprintf(filew, "%d, ", caminho[i]);
-    }
-    fclose(filew);
-
-
-    while (true){
-        nearestNeighbor(n, M, caminho, custo);
-        vnd(n, M, caminho, custo);
-        solucao = calcSolucao(n, M, caminho, custo);
-        if (menorSolucao > solucao){
-            menorSolucao = solucao;
-            filew = fopen("solucao.txt", "w");
-            fprintf(filew, "Solucao: %d\nCaminho: ", solucao);
-            for (i = 0 ; i <= n ; i++){
-                printf ("%d, ", caminho[i]);
-                fprintf(filew, "%d, ", caminho[i]);
+            for (i = v1; i >= v2; i--){
+               if (i == v2){
+                   caminho[i] = aux;
+                   break;
+               }
+               caminho[i] = caminho[i-1];
             }
-            fclose(filew);
         }
+        *solucao = calcSolucao (n, M, caminho, custo);
+        swaped = true;
+        //printf ("\nRE-INSERT nova solucao: %d", *solucao);
     }
-
+    return swaped;
 }
+
+bool vnd_twoOpt(int n, int **M, int caminho[n], int custo[n], int *solucao){
+    int i, j, menorSolucao, novaSolucao, v1, v2, aux;
+    bool swaped = false;
+
+    i = j = 1;
+    menorSolucao = *solucao;
+    novaSolucao = INT_MAX;
+
+    while (i < n-2){
+        for (j = i+3 ; j<n; j++){
+            novaSolucao = *solucao - M[caminho[i-1]][caminho[i]] - M[caminho[j+1]][caminho[j]]
+                                   + M[caminho[j+1]][caminho[i]] + M[caminho[i-1]][caminho[j]];
+            if (novaSolucao < menorSolucao){
+                menorSolucao = novaSolucao;
+                v1 = i;
+                v2 = j;
+            }
+        }
+        ++i;
+    }
+    j = v2;
+    if (menorSolucao < *solucao){
+        for (i = v1; i<j;i++){
+            aux = caminho[i];
+            caminho[i] = caminho[j];
+            caminho[j] = aux;
+            j--;
+        }
+        *solucao = calcSolucao(n, M, caminho, custo);
+        //printf ("\n2-OPT Nova solucao: %d", *solucao);
+        swaped = true;
+    }
+    return swaped;
+}
+
+void vnd (int n, int M[n][n], int caminho[n], int custo[n]){
+    bool foundSol = false;
+    int i = 0;
+    int solucao = calcSolucao(n, M, caminho, custo);
+    /*int novaSolucao = INT_MAX;
+    int i, j, aux;
+    i = j = 1; //Começa de 1 pois 0 é o vértice de partida e não deve sofrer swap
+    int start = 1;
+*/
+    while (true){
+        while (true){
+            if (!vndSwap(n, M, caminho, custo, &solucao))
+                break;
+        }
+        if (vnd_twoOpt(n, M, caminho, custo, &solucao))
+            continue;
+
+        if (vnd_reinsert(n, M, caminho, custo, &solucao))
+            continue;
+
+        break;
+    }
+}
+
+
+#endif // VND_H_INCLUDED
