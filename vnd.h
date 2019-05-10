@@ -69,7 +69,9 @@ bool vndSwap (int n, int **M, int caminho[n], int custo[n], int *solucao){
 bool vnd_reinsert (int n, int **M, int caminho[n], int custo[n], int *solucao){
     int i, j, start, menorSolucao, v1, v2, aux;
     bool swaped = false;
-    i = j = start = 1;
+    i = 1;
+    j = 0;
+
     menorSolucao = *solucao;
     int novaSolucao = INT_MAX;
 
@@ -88,7 +90,7 @@ bool vnd_reinsert (int n, int **M, int caminho[n], int custo[n], int *solucao){
             }
             j++;
         }
-        j = 1;
+        j = 0;
         i++;
     }
     if (menorSolucao < *solucao){
