@@ -103,7 +103,7 @@ bool vnd_reinsert (int n, int **M, int caminho[n], int custo[n], int *solucao){
             }
         } else {
             for (i = v1; i >= v2; i--){
-               if (i == v2){
+               if (i-1 == v2){
                    caminho[i] = aux;
                    break;
                }
