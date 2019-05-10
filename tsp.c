@@ -68,7 +68,7 @@ void nearestNeighbor (int n, int **M, int caminho[n], int custo[n], float alfa){
     float random;
     int countLCR = 0;
 
-    for (i = 0; i < n; i++){ //inicializa array de vÃ©rtices visitados
+    for (i = 0; i < n; i++){ //inicializa array de vértices visitados
         visited[i] = false;
     }
 
@@ -159,7 +159,7 @@ void caminhoAleatorio (int n, int **M, int caminho[n], int custo[n]){
 }
 
 int main (){
-    FILE* file = fopen ("tsp1.txt", "r"); //abre o arquivo passado como argumento
+    FILE* file = fopen ("tsp3.txt", "r"); //abre o arquivo passado como argumento
     if (file == NULL)
     {
       printf ("Falha ao tentar ler arquivo.");
@@ -211,10 +211,10 @@ int main (){
         for (i = 0; i<n;i++){
             printf ("\n%d   %f    %f", index[i], x[i], y[i]);
         }
-        mount_display_data_section(n, M, x, y); //LÃª coordenadas na seÃ§Ã£o DISPLAY_DATA e converte para matriz de adjacÃªncia
+        mount_display_data_section(n, M, x, y); //Lê coordenadas na seção DISPLAY_DATA e converte para matriz de adjacência
     }
     if (edge){
-        mount_edge_weight_section (n, M,file); //LÃª a matriz dada na seÃ§Ã£o EDGE_WEIGHT_SECTION
+        mount_edge_weight_section (n, M,file); //Lê a matriz dada na seção EDGE_WEIGHT_SECTION
     }
     fclose(file);
 
@@ -228,9 +228,9 @@ int main (){
     }
     */
 
-    int caminho[n+1]; // um vertice em caminho[x] irÃ¡ para caminho[x+1]
+    int caminho[n+1]; // um vertice em caminho[x] irá para caminho[x+1]
     int custo[n];
-    for (i = 0 ; i <= n ; i++){ //constrÃ³i caminho arbitrÃ¡rio
+    for (i = 0 ; i <= n ; i++){ //constrói caminho arbitrário
         if (i == n){
             caminho[i] = caminho[0];
             break;
@@ -268,10 +268,11 @@ int main (){
     solucoes = malloc(10*sizeof(int));
     printf ("\n----Iniciando GRASP----\n\n");
 
+    //---------GRASP----------
     while (i < 10){
-        nearestNeighbor(n, M, caminho, custo, 0.8);
+        nearestNeighbor(n, M, caminho, custo, 0.6);
         solucoesC[i] = calcSolucao(n, M, caminho, custo);
-        printf("\nConstrutiva heurÃ­stica: %d", calcSolucao(n, M, caminho, custo));
+        printf("\nConstrutiva heurística: %d", calcSolucao(n, M, caminho, custo));
         vnd(n, M, caminho, custo);
         solucao = calcSolucao(n, M, caminho, custo);
         solucoes[i] = solucao;
@@ -297,7 +298,7 @@ int main (){
     mediaC = mediaC/10;
     media = media/10;
 
-    printf("\n\nMedia construtiva: %d\nMedia meta-heurÃ­stica: %d", mediaC, media);
+    printf("\n\nMedia construtiva: %d\nMedia meta-heurística: %d", mediaC, media);
     printf("\nMenor solucao encontrda: %d", menorSolucao);
     //printf("\nGap: %f", gap(menorSolucao, OTIMA));
 

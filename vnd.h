@@ -8,7 +8,7 @@ int rand_lim(int min_n, int max_n) {
     return rand() % (max_n - min_n + 1) + min_n;
 }
 
-//Retorna Solu√ß√£o dado um caminho atual
+//Retorna SoluÁ„o dado um caminho atual
 int calcSolucao (int n, int **M, int caminho[n], int custo[n]){
     int i;
     int solucao = 0;
@@ -35,10 +35,10 @@ bool vndSwap (int n, int **M, int caminho[n], int custo[n], int *solucao){
                 j++;
                 continue;
             }
-            if (j == i+1){ //V√©rtices adjacentes
+            if (j == i+1){ //VÈrtices adjacentes
                 novaSolucao = *solucao - M[caminho[i-1]][caminho[i]] - M[caminho[j]][caminho[j+1]]
                                   + M[caminho[i-1]][caminho[j]] + M[caminho[i]][caminho[j+1]];
-            } else{ // Se os dois v√©rtices n√£o s√£o adjacentes~
+            } else{ // Se os dois vÈrtices n„o s„o adjacentes~
                 novaSolucao = *solucao - M[caminho[i-1]][caminho[i]] - M[caminho[j]][caminho[j+1]]
                                   + M[caminho[i-1]][caminho[j]] + M[caminho[i]][caminho[j+1]]
                                   - M[caminho[i]][caminho[i+1]] - M[caminho[j-1]][caminho[j]]
@@ -60,7 +60,7 @@ bool vndSwap (int n, int **M, int caminho[n], int custo[n], int *solucao){
         caminho[v2] = aux;
         swaped = true;
         *solucao = calcSolucao(n, M, caminho, custo);
-        //printf("\nSWAP Nova solucao: %d", *solucao);
+        printf("\nSWAP Nova solucao: %d", *solucao);
     }
 
     return swaped;
@@ -71,7 +71,6 @@ bool vnd_reinsert (int n, int **M, int caminho[n], int custo[n], int *solucao){
     bool swaped = false;
     i = 1;
     j = 0;
-
     menorSolucao = *solucao;
     int novaSolucao = INT_MAX;
 
@@ -114,7 +113,7 @@ bool vnd_reinsert (int n, int **M, int caminho[n], int custo[n], int *solucao){
         }
         *solucao = calcSolucao (n, M, caminho, custo);
         swaped = true;
-        //printf ("\nRE-INSERT nova solucao: %d", *solucao);
+        printf ("\nRE-INSERT nova solucao: %d", *solucao);
     }
     return swaped;
 }
@@ -148,7 +147,7 @@ bool vnd_twoOpt(int n, int **M, int caminho[n], int custo[n], int *solucao){
             j--;
         }
         *solucao = calcSolucao(n, M, caminho, custo);
-        //printf ("\n2-OPT Nova solucao: %d", *solucao);
+        printf ("\n2-OPT Nova solucao: %d", *solucao);
         swaped = true;
     }
     return swaped;
@@ -160,19 +159,21 @@ void vnd (int n, int M[n][n], int caminho[n], int custo[n]){
     int solucao = calcSolucao(n, M, caminho, custo);
     /*int novaSolucao = INT_MAX;
     int i, j, aux;
-    i = j = 1; //Come√ßa de 1 pois 0 √© o v√©rtice de partida e n√£o deve sofrer swap
+    i = j = 1; //ComeÁa de 1 pois 0 È o vÈrtice de partida e n„o deve sofrer swap
     int start = 1;
 */
     while (true){
-        while (true){
-            if (!vndSwap(n, M, caminho, custo, &solucao))
-                break;
-        }
-        if (vnd_twoOpt(n, M, caminho, custo, &solucao))
-            continue;
 
         if (vnd_reinsert(n, M, caminho, custo, &solucao))
             continue;
+
+        if (vnd_twoOpt(n, M, caminho, custo, &solucao))
+            continue;
+
+        if (vndSwap(n, M, caminho, custo, &solucao))
+            continue;
+
+
 
         break;
     }
