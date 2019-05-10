@@ -253,7 +253,7 @@ int main (){
         menorSolucao = solucao;
 
     FILE* filew = fopen ("solucao.txt", "w");
-    fprintf(filew, "Solucao: %d\nCaminho: ");
+    fprintf(filew, "Solucao: %d\nCaminho: ", solucao);
     for (i = 0 ; i <= n ; i++){
         fprintf(filew, "%d, ", caminho[i]);
     }
