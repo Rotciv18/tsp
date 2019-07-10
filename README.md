@@ -1,4 +1,3 @@
-# tsp
 Projeto final da disciplina Análise e Projeto de Algoritmos
 
 Resolução do problema do Caixeiro Viajante (https://pt.wikipedia.org/wiki/Problema_do_caixeiro-viajante)
